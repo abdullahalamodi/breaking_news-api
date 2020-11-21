@@ -1,19 +1,21 @@
-<?php 
+<?php
 include('../Database/Database.php');
 include('Category.php');
-class News{
+class News
+{
     public $id;
     public $title;
     public $image;
     public $date;
     public $details;
+    public $category_id;
     private $database;
 
 
     function __construct()
     {
         $db = new Database();
-        $this->database = $db->connect();        
+        $this->database = $db->connect();
     }
 
     public function getNews()
@@ -69,23 +71,42 @@ class News{
         return $this->getNewsByCategory($category->id);
     }
 
-    public function addNews($data)
+    public function addNews()
     {
-        
+        try {
+            $query = $this->database->prepare("insert into news values(?,?,?,now(),?,?)");
+            $query->execute([$this->id, $this->title, $this->image, $this->details, $this->category_id]);
+            return true;
+        } catch (PDOException $e) {
+            return false;
+        }
     }
 
     public function updateNews($id)
     {
-        
+        $news = $this->getOneNews($id);
+        ($this->title != null) ? $news->title =  $this->title : "";
+        ($this->image != null) ? $news->image =  $this->image : "";
+        ($this->details != null) ? $news->details =  $this->details : "";
+        ($this->category_id != null) ? $news->category_id =  $this->category_id : "";
+        try {
+            $query = $this->database->prepare("UPDATE `news` SET `title`=?,`image`=?,
+            `details`=?,`category_id`=? WHERE id = ?");
+            $query->execute([$this->title, $this->image, $this->details, $this->category_id, $id]);
+            return true;
+        } catch (PDOException $e) {
+            return false;
+        }
     }
 
     public function deleteNews($id)
     {
-        
+        try {
+            $query = $this->database->prepare("delete from news where id=?");
+            $query->execute([$id]);
+            return true;
+        } catch (PDOException $e) {
+            return false;
+        }
     }
-
-
-
 }
-
-?>

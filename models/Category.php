@@ -7,7 +7,6 @@ class Category{
     public $sub_title;
     private $database;
 
-
     function __construct()
     {
         $db = new Database();
